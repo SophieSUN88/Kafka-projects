@@ -1,1 +1,55 @@
+# Kafka basic
+## Objective
+Try to communicate with Kafka from local:
+- 1)write to Kafka，
+- 2）read from Kafka
+
+## First : create producer Demo class
+Think top-down,define what we are going to do, then make the code into details.
+objective: we need function help us to write records to Kafka
+
+### 0. create properties for kafka producer
+- before we create the Kafka producer, we need the Properties first
+1) property 1- bootstrap_server
+  - solution 1: set the bootstrp_server directly.Not best solution. 
+Final static String BOOTSTRAP_SERVER = “localhost:9092”;
+Properties.setProperty(“bootstrap-server”,BOOTSTRAP_SERVER);
+  - solution2: use ProducerConfig class in package: org.apache.kafka.clients.producer(show in code.)
+2) property 2: ACK_CONFIG (0,1,all)
+3) property 3:serializer：串行（化）器（把并行数据变成串行数据的寄存器）
+when we need to write the key，use StringSerializer to serializer。
+when we need to write the value，use StringSerializer to serializer。
+
+### 1.create Kafka server(producer) 
+   -> new producer +metadata : bootstrap_server + topic +...
+   create producer in local，then tell the infomatio in metadata to producer
+POINT: KafkaProducer is a tool supplied by Kafka，help us to send message, just it. 
+This API can help us to connect to bootstrapserver, http client, how to send the message, 
+how to serialize the message and so on. But it only abstract layer. 
+It know how to do the job, but do not known do the job for who. 
+So we need to supply the record to it, and tell it what is the bootstracp, what kind of acks we want, 
+which kind of serialize the message , and so on.
+
+### 2.create record -> with/without key + value..
+1)create a record without key, producer will send record in "roundrobin" ORDER
+2)create a record with key, producer will send record in "hash key" ORDER
+
+### 3.send record to Kafka -> send + flush ... 
+Difference between send() and flush() ?
+send() only is a record,flush() will execute to push the record to Kafka 
+Here just to see the result, so add flush() immediately, in real case, we do not add flush for each step, we will flush once at end of after while.
+
+When run the code successfully, we will see the properties we set up, and there are also other default properties included. 
+And we can see the info of Kafka version, commitId, startTimeMs.
+And the logger we made in the code about the topic, partition, offset, timestamp. 
+If we use recordwithKey, or recordWithoutKey, we will see the difference in partitions.
+
+## Second: create consumer Demo class
+### 0. create properties
+1) property 1- bootstrap_server
+2) deserializer by StringDeserializer
+3) get group ID
+### 1.create sonsumer client
+### 2.subscribe topic
+### 3.define how to pull records
 
