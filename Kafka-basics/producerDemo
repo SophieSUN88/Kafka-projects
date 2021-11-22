@@ -24,30 +24,32 @@ public class ProducerDemo {
         properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         properties.setProperty(ProducerConfig.ACKS_CONFIG, "1");
 
-        //创建producer
+        // create producer
         KafkaProducer<String, String> producer = new KafkaProducer<String, String>(properties);
 
-        //创建一个没有key的record，producer会按照roundrobin方式发送
+        // creat record without key, producer will send message in "roundrobin" order
         ProducerRecord<String, String> recordNoKey =
                 new ProducerRecord<String, String>(topic, "hello world without key");
 
-        //发送数据 - asynchronous
-        //producer.send(recordNoKey);
-        //flush数据 - blocking call
-        //producer.flush();
+        //send message - asynchronous
+        producer.send(recordNoKey);
+        //flush data - blocking call
+        producer.flush();
         //difference between send() and flush() ?
 
-        //创建一个有key的record，会按照hash key的方式发送
+        //creat record with key, producer will send message in "hash key" order
         String key = "id1";
         ProducerRecord<String, String> recordWithKey =
                 new ProducerRecord<String, String>(topic, key, "hello world with key");
         //producer.send(recordWithKey);
 
-        //如果我想知道我的数据发送到哪里去了呢？一般代码里没有这一段，因为不会写到console，而是直接去logger日志里读取
+        // If I want to know whether the message is sent succesfully,we can create the onCompletion funtioin, show the result in console.
+        // But in general ,we won't use this function, because we will save the results in loggers, not print in console.
+        // But it will be easier for someone first run the producer code to kafka,and make sure whether it works or not.
         producer.send(recordWithKey, new Callback() {
-            // 当这条信息发送成功了或者失败了 这个方法就会返回
+            // when the message is sent succesfully or not , the result will be print in console
             public void onCompletion(RecordMetadata recordMetadata, Exception e) {
-                // 当信息发送成功
+                // when it successes:
                 if (e == null) {
                     logger.info("Received new metadata. \n" +
                             "Topic:" + recordMetadata.topic() + "\n" +
@@ -55,13 +57,13 @@ public class ProducerDemo {
                             "Offset: " + recordMetadata.offset() + "\n" +
                             "Timestamp: " + recordMetadata.timestamp());
                 } else {
-                    //当信息发送失败
+                    // when it fails:
                     logger.error("Error while producing", e);
                 }
             }
-        }).get(); //在production里写代码时候不可以这样做🚫
+        }).get(); 
 
-        // flush数据并关闭producer
+        // close producer after flush()
         producer.close();
 
     }
