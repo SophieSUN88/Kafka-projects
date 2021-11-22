@@ -53,4 +53,11 @@ If we use recordwithKey, or recordWithoutKey, we will see the difference in part
 ### 2.subscribe topic
 ### 3.define how to pull records
 
+
+## CODE IN PYTHON
+Nowadays python is more and more popular. So I try to use python to connect with Kafka.
+The third file named "Kafka-Python-basic.ipynb" is a simple example
+1. create producer, send some message, fluch
+2. create consumer, read the message. But still need to close the consumer by hand.
+
  
