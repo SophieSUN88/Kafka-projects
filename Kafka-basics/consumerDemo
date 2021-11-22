@@ -1,0 +1,53 @@
+package basic;
+
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.Properties;
+
+public class ConsumerDemo {
+
+    public static void main(String[] args) {
+
+        Logger logger = LoggerFactory.getLogger(ConsumerDemo.class.getName());
+
+        String bootstrapServers = "z-1.bigdata-cluster.b1bkjx.c2.kafka.us-east-2.amazonaws.com:2181";
+        String groupId = "my-kafka-application";
+        String topic = "bigdata";
+
+        // 创建consumer configs
+        Properties properties = new Properties();
+        properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+
+        //创建consumer
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(properties);
+
+        //consumer可以接收一个或多个topic来的信息
+        consumer.subscribe(Arrays.asList(topic));
+
+        // 从topic里主动的pull数据
+        while(true){
+            //每隔100ms pull一下数据
+            ConsumerRecords<String, String> records =
+                    consumer.poll(Duration.ofMillis(100)); //
+
+            for (ConsumerRecord<String, String> record : records){
+                logger.info("Key: " + record.key() + ", Value: " + record.value());
+                logger.info("Partition: " + record.partition() + ", Offset:" + record.offset());
+            }
+        }
+
+        //为什么没有consumer.close()?
+    }
+}
