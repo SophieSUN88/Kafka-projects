@@ -22,7 +22,7 @@ public class ConsumerDemo {
         String groupId = "my-kafka-application";
         String topic = "bigdata";
 
-        // 创建consumer configs
+        // create consumer configs
         Properties properties = new Properties();
         properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
@@ -30,24 +30,29 @@ public class ConsumerDemo {
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-        //创建consumer
+        // create consumer
         KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(properties);
 
-        //consumer可以接收一个或多个topic来的信息
+        //consumer can pull 1 or more topics
         consumer.subscribe(Arrays.asList(topic));
 
-        // 从topic里主动的pull数据
+        // pull data from topic
         while(true){
-            //每隔100ms pull一下数据
+            // pull data each 100ms 
             ConsumerRecords<String, String> records =
                     consumer.poll(Duration.ofMillis(100)); //
 
-            for (ConsumerRecord<String, String> record : records){
-                logger.info("Key: " + record.key() + ", Value: " + record.value());
-                logger.info("Partition: " + record.partition() + ", Offset:" + record.offset());
+            for (ConsumerRecord<String, String> record : records) {
+                String value = record.value();
+                // if value contains "test", continue means drop this message
+                if (value.contains("test")) {
+                    continue;
+                } else { 
+                // if not, print in console
+                    logger.info("Key: " + record.key() + ", Value: " + record.value());
+                    logger.info("Partition: " + record.partition() + ", Offset:" + record.offset());
+                }
             }
         }
-
-        //为什么没有consumer.close()?
     }
 }
