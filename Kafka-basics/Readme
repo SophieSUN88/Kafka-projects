@@ -3,7 +3,7 @@
 Try to communicate with Kafka from local:
 - 1)write to Kafka，
 - 2）read from Kafka
-
+ 
 ## First : create producer Demo class
 Think top-down,define what we are going to do, then make the code into details.
 objective: we need function help us to write records to Kafka
